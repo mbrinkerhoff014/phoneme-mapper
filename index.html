@@ -38,8 +38,8 @@
     position: relative;
     border: 2px solid #333;
     border-radius: 6px;
-    min-width: 100px;
-    max-width: 1000px;
+    min-width: 90px;
+    max-width: 600px;
     min-height: 80px;
     padding: 10px;
     box-sizing: border-box;
@@ -49,7 +49,7 @@
     align-items: center;
   }
   .box input {
-    width: 100%;
+    width: 90px; /* initial min width */
     font-size: 32px;
     font-weight: bold;
     text-align: center;
@@ -59,6 +59,7 @@
     resize: none;
     overflow: hidden;
     white-space: nowrap;
+    font-family: Arial, sans-serif;
   }
   #silent-e-container {
     text-align: center;
@@ -80,6 +81,19 @@
     pointer-events: none;
     user-select: none;
   }
+
+  /* Hidden span for measuring text width */
+  #text-measure {
+    position: absolute;
+    visibility: hidden;
+    white-space: nowrap;
+    font-size: 32px;
+    font-weight: bold;
+    font-family: Arial, sans-serif;
+    padding: 0;
+    margin: 0;
+    border: none;
+  }
 </style>
 </head>
 <body>
@@ -97,12 +111,16 @@
     <label id="silent-e-label" for="silent-e-checkbox">Silent E</label>
   </div>
 
+  <!-- Hidden span for measuring text width -->
+  <span id="text-measure"></span>
+
 <script>
   const boxContainer = document.getElementById("box-container");
   const addBoxBtn = document.getElementById("addBoxBtn");
   const removeBoxBtn = document.getElementById("removeBoxBtn");
   const resetBtn = document.getElementById("resetBtn");
   const silentECheckbox = document.getElementById("silent-e-checkbox");
+  const textMeasure = document.getElementById("text-measure");
 
   // Create the "e" letter element for silent E
   const silentELetter = document.createElement("div");
@@ -119,26 +137,19 @@
     const input = document.createElement("input");
     input.type = "text";
     input.maxLength = 50;  // allow many letters
-    input.style.width = "60px"; // initial min width
+    input.style.width = "90px"; // initial min width
 
     // Update box input width dynamically based on content width
     function updateWidth() {
-      // Create temporary span for measurement
-      const span = document.createElement("span");
-      span.style.visibility = "hidden";
-      span.style.position = "absolute";
-      span.style.whiteSpace = "nowrap";
-      span.style.fontSize = input.style.fontSize;
-      span.style.fontWeight = input.style.fontWeight;
-      span.style.fontFamily = input.style.fontFamily;
-      span.textContent = input.value || "A"; // at least one char to measure
+      // Use the hidden span to measure the text width exactly
+      const text = input.value || "A"; // measure at least one char
+      textMeasure.textContent = text;
 
-      document.body.appendChild(span);
-      let width = span.offsetWidth + 30; // add some padding
-      document.body.removeChild(span);
+      // Get computed width of text in px
+      let width = textMeasure.offsetWidth + 30; // add some padding for cursor & input padding
 
       // Clamp width between min and max width
-      width = Math.min(Math.max(width, 60), 500);
+      width = Math.min(Math.max(width, 90), 600);
 
       input.style.width = width + "px";
       updateSilentEPosition();
@@ -175,7 +186,7 @@
     const inputs = boxContainer.querySelectorAll("input[type=text]");
     inputs.forEach(input => {
       input.value = "";
-      input.style.width = "60px"; // reset to min width
+      input.style.width = "90px"; // reset to min width
     });
     silentECheckbox.checked = false;
     silentELetter.style.display = "none";
