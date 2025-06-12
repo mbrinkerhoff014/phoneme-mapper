@@ -27,7 +27,7 @@
   }
   #box-container {
     display: flex;
-    flex-wrap: nowrap; /* no wrapping so silent e lines up nicely */
+    flex-wrap: nowrap; /* keep on one line so silent e aligns */
     gap: 12px;
     justify-content: center;
     margin-bottom: 40px;
@@ -39,7 +39,7 @@
     border: 2px solid #333;
     border-radius: 6px;
     min-width: 60px;
-    max-width: 300px;
+    max-width: 500px;
     min-height: 80px;
     padding: 10px;
     box-sizing: border-box;
@@ -74,9 +74,9 @@
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    font-size: 32px;
+    font-size: 44px;
     font-weight: bold;
-    color: rgba(0,0,0,0.3);
+    color: rgba(0,0,0,0.4);
     pointer-events: none;
     user-select: none;
   }
@@ -118,11 +118,12 @@
 
     const input = document.createElement("input");
     input.type = "text";
-    input.maxLength = 20;  // allow many letters but box will expand
-    input.style.width = "60px"; // start min width
+    input.maxLength = 50;  // allow many letters
+    input.style.width = "60px"; // initial min width
 
-    // Update box input width dynamically
+    // Update box input width dynamically based on content width
     function updateWidth() {
+      // Create temporary span for measurement
       const span = document.createElement("span");
       span.style.visibility = "hidden";
       span.style.position = "absolute";
@@ -130,12 +131,15 @@
       span.style.fontSize = input.style.fontSize;
       span.style.fontWeight = input.style.fontWeight;
       span.style.fontFamily = input.style.fontFamily;
-      span.textContent = input.value || "A"; // measure at least one char
+      span.textContent = input.value || "A"; // at least one char to measure
+
       document.body.appendChild(span);
-      let width = span.offsetWidth + 30; // add padding for comfort
+      let width = span.offsetWidth + 30; // add some padding
       document.body.removeChild(span);
+
       // Clamp width between min and max width
-      width = Math.min(Math.max(width, 60), 300);
+      width = Math.min(Math.max(width, 60), 500);
+
       input.style.width = width + "px";
       updateSilentEPosition();
     }
@@ -187,11 +191,9 @@
       silentELetter.style.display = "none";
       return;
     }
-    // Position silent E behind last box, slightly to the right
     const lastBox = boxes[boxes.length - 1];
-    const rect = lastBox.getBoundingClientRect();
-    const containerRect = boxContainer.getBoundingClientRect();
-    const offsetLeft = lastBox.offsetLeft + lastBox.offsetWidth - 10; // slightly inside right edge
+    // Position silent E behind last box, slightly to the right
+    const offsetLeft = lastBox.offsetLeft + lastBox.offsetWidth - 12; // slightly inside right edge
     const offsetTop = lastBox.offsetTop + lastBox.offsetHeight / 2;
 
     silentELetter.style.left = offsetLeft + "px";
