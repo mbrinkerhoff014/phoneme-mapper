@@ -49,18 +49,42 @@
     align-items: center;
   }
   .box input {
-    width: 90px; /* initial min width */
-    font-size: 32px;
-    font-weight: bold;
-    text-align: center;
-    border: none;
-    outline: none;
-    background: transparent;
-    resize: none;
-    overflow: hidden;
-    white-space: nowrap;
-    font-family: Arial, sans-serif;
-  }
+  width: 90px;
+  font-size: 40px;       /* increased from 32px */
+  font-weight: bold;
+  text-align: center;
+  border: none;
+  outline: none;
+  background: transparent;
+  resize: none;
+  overflow: hidden;
+  white-space: nowrap;
+  font-family: Arial, sans-serif;
+}
+
+#text-measure {
+  position: absolute;
+  visibility: hidden;
+  white-space: nowrap;
+  font-size: 40px;       /* increased from 32px */
+  font-weight: bold;
+  font-family: Arial, sans-serif;
+  padding: 0;
+  margin: 0;
+  border: none;
+}
+
+#silent-e-letter {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 52px;       /* bigger silent e */
+  font-weight: bold;
+  color: rgba(0,0,0,0.4);
+  pointer-events: none;
+  user-select: none;
+}
+
   #silent-e-container {
     text-align: center;
     font-size: 18px;
@@ -69,30 +93,6 @@
   #silent-e-label {
     cursor: pointer;
     user-select: none;
-  }
-  /* The silent e letter displayed behind last box */
-  #silent-e-letter {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 44px;
-    font-weight: bold;
-    color: rgba(0,0,0,0.4);
-    pointer-events: none;
-    user-select: none;
-  }
-
-  /* Hidden span for measuring text width */
-  #text-measure {
-    position: absolute;
-    visibility: hidden;
-    white-space: nowrap;
-    font-size: 32px;
-    font-weight: bold;
-    font-family: Arial, sans-serif;
-    padding: 0;
-    margin: 0;
-    border: none;
   }
 </style>
 </head>
