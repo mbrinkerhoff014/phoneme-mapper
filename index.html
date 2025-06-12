@@ -46,25 +46,12 @@
   }
   .box input {
     width: 100%;
-    font-size: 24px;
+    font-size: 32px;        /* larger font size */
+    font-weight: bold;      /* bold text */
     text-align: center;
     border: none;
     outline: none;
     background: transparent;
-  }
-  .remove-btn {
-    position: absolute;
-    top: 3px;
-    right: 3px;
-    background: #ff4d4d;
-    border: none;
-    border-radius: 50%;
-    width: 22px;
-    height: 22px;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    line-height: 1;
   }
 </style>
 </head>
@@ -72,6 +59,7 @@
   <h2>Phoneme-Grapheme Mapper</h2>
   <div id="controls">
     <button id="addBoxBtn">+ Add Box</button>
+    <button id="removeBoxBtn">- Remove Last Box</button>
     <button id="resetBtn">Reset All</button>
   </div>
   <div id="box-container"></div>
@@ -79,45 +67,35 @@
 <script>
   const boxContainer = document.getElementById("box-container");
   const addBoxBtn = document.getElementById("addBoxBtn");
+  const removeBoxBtn = document.getElementById("removeBoxBtn");
   const resetBtn = document.getElementById("resetBtn");
 
-  // Keep track of boxes
-  let boxes = [];
-
-  function createBox(id) {
+  // Keep track of boxes by their DOM elements
+  function createBox() {
     const boxDiv = document.createElement("div");
     boxDiv.classList.add("box");
-    boxDiv.dataset.id = id;
 
     const input = document.createElement("input");
     input.type = "text";
     input.placeholder = "Letter(s)";
     input.maxLength = 5;
     input.addEventListener("input", () => {
-      // Automatically uppercase letters
       input.value = input.value.toUpperCase();
     });
 
-    const removeBtn = document.createElement("button");
-    removeBtn.classList.add("remove-btn");
-    removeBtn.textContent = "×";
-    removeBtn.title = "Remove box";
-    removeBtn.onclick = () => {
-      boxContainer.removeChild(boxDiv);
-      boxes = boxes.filter(b => b !== id);
-    };
-
     boxDiv.appendChild(input);
-    boxDiv.appendChild(removeBtn);
-
     return boxDiv;
   }
 
   function addBox() {
-    const id = Date.now();
-    boxes.push(id);
-    const box = createBox(id);
+    const box = createBox();
     boxContainer.appendChild(box);
+  }
+
+  function removeLastBox() {
+    if (boxContainer.lastChild) {
+      boxContainer.removeChild(boxContainer.lastChild);
+    }
   }
 
   function resetBoxes() {
@@ -129,6 +107,7 @@
   addBox();
 
   addBoxBtn.addEventListener("click", addBox);
+  removeBoxBtn.addEventListener("click", removeLastBox);
   resetBtn.addEventListener("click", resetBoxes);
 </script>
 </body>
