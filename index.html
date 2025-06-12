@@ -27,17 +27,19 @@
   }
   #box-container {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap; /* no wrapping so silent e lines up nicely */
     gap: 12px;
     justify-content: center;
-    margin-bottom: 20px;
+    margin-bottom: 40px;
+    position: relative;
+    min-height: 100px;
   }
   .box {
     position: relative;
     border: 2px solid #333;
     border-radius: 6px;
     min-width: 60px;
-    max-width: 180px;
+    max-width: 300px;
     min-height: 80px;
     padding: 10px;
     box-sizing: border-box;
@@ -48,8 +50,8 @@
   }
   .box input {
     width: 100%;
-    font-size: 32px;        /* large font */
-    font-weight: bold;      /* bold text */
+    font-size: 32px;
+    font-weight: bold;
     text-align: center;
     border: none;
     outline: none;
@@ -60,21 +62,23 @@
   }
   #silent-e-container {
     text-align: center;
+    font-size: 18px;
     margin-top: 10px;
   }
-  #silent-e-container label {
-    font-weight: bold;
-    font-size: 18px;
+  #silent-e-label {
+    cursor: pointer;
+    user-select: none;
   }
-  #silent-e {
+  /* The silent e letter displayed behind last box */
+  #silent-e-letter {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
     font-size: 32px;
     font-weight: bold;
-    width: 40px;
-    text-align: center;
-    border: 2px solid #333;
-    border-radius: 6px;
-    margin-left: 10px;
-    background: white;
+    color: rgba(0,0,0,0.3);
+    pointer-events: none;
+    user-select: none;
   }
 </style>
 </head>
@@ -89,8 +93,8 @@
   <div id="box-container"></div>
 
   <div id="silent-e-container">
-    <label>Silent E:</label>
-    <input type="text" id="silent-e" maxlength="1" />
+    <input type="checkbox" id="silent-e-checkbox" />
+    <label id="silent-e-label" for="silent-e-checkbox">Silent E</label>
   </div>
 
 <script>
@@ -98,7 +102,14 @@
   const addBoxBtn = document.getElementById("addBoxBtn");
   const removeBoxBtn = document.getElementById("removeBoxBtn");
   const resetBtn = document.getElementById("resetBtn");
-  const silentEInput = document.getElementById("silent-e");
+  const silentECheckbox = document.getElementById("silent-e-checkbox");
+
+  // Create the "e" letter element for silent E
+  const silentELetter = document.createElement("div");
+  silentELetter.id = "silent-e-letter";
+  silentELetter.textContent = "e";
+  silentELetter.style.display = "none";
+  boxContainer.appendChild(silentELetter);
 
   // Create a new box element with input
   function createBox() {
@@ -107,25 +118,26 @@
 
     const input = document.createElement("input");
     input.type = "text";
-    input.maxLength = 10;  // allow more letters but box will expand
+    input.maxLength = 20;  // allow many letters but box will expand
     input.style.width = "60px"; // start min width
 
     // Update box input width dynamically
     function updateWidth() {
-      // Create a temporary span to measure text width
       const span = document.createElement("span");
       span.style.visibility = "hidden";
       span.style.position = "absolute";
       span.style.whiteSpace = "nowrap";
       span.style.fontSize = input.style.fontSize;
       span.style.fontWeight = input.style.fontWeight;
+      span.style.fontFamily = input.style.fontFamily;
       span.textContent = input.value || "A"; // measure at least one char
       document.body.appendChild(span);
-      let width = span.offsetWidth + 20; // add some padding
+      let width = span.offsetWidth + 30; // add padding for comfort
       document.body.removeChild(span);
       // Clamp width between min and max width
-      width = Math.min(Math.max(width, 60), 180);
+      width = Math.min(Math.max(width, 60), 300);
       input.style.width = width + "px";
+      updateSilentEPosition();
     }
 
     input.addEventListener("input", () => {
@@ -142,33 +154,59 @@
 
   function addBox() {
     const box = createBox();
-    boxContainer.appendChild(box);
+    boxContainer.insertBefore(box, silentELetter);
+    updateSilentEPosition();
   }
 
   function removeLastBox() {
-    if (boxContainer.lastChild) {
-      boxContainer.removeChild(boxContainer.lastChild);
+    const boxes = boxContainer.querySelectorAll(".box");
+    if (boxes.length > 0) {
+      const lastBox = boxes[boxes.length - 1];
+      boxContainer.removeChild(lastBox);
+      updateSilentEPosition();
     }
   }
 
   function resetBoxes() {
-    const inputs = boxContainer.querySelectorAll("input");
+    const inputs = boxContainer.querySelectorAll("input[type=text]");
     inputs.forEach(input => {
       input.value = "";
       input.style.width = "60px"; // reset to min width
     });
-    silentEInput.value = "";
+    silentECheckbox.checked = false;
+    silentELetter.style.display = "none";
   }
 
-  // Silent E input logic
-  silentEInput.addEventListener("input", () => {
-    let val = silentEInput.value.toLowerCase();
-    if (val !== "e" && val !== "") {
-      // only allow 'e' or empty
-      silentEInput.value = "";
-    } else {
-      silentEInput.value = val === "e" ? "e" : "";
+  function updateSilentEPosition() {
+    if (!silentECheckbox.checked) {
+      silentELetter.style.display = "none";
+      return;
     }
+    const boxes = boxContainer.querySelectorAll(".box");
+    if (boxes.length === 0) {
+      silentELetter.style.display = "none";
+      return;
+    }
+    // Position silent E behind last box, slightly to the right
+    const lastBox = boxes[boxes.length - 1];
+    const rect = lastBox.getBoundingClientRect();
+    const containerRect = boxContainer.getBoundingClientRect();
+    const offsetLeft = lastBox.offsetLeft + lastBox.offsetWidth - 10; // slightly inside right edge
+    const offsetTop = lastBox.offsetTop + lastBox.offsetHeight / 2;
+
+    silentELetter.style.left = offsetLeft + "px";
+    silentELetter.style.top = offsetTop + "px";
+    silentELetter.style.display = "block";
+  }
+
+  // When the checkbox changes, update silent E visibility
+  silentECheckbox.addEventListener("change", () => {
+    updateSilentEPosition();
+  });
+
+  // On window resize, reposition silent E
+  window.addEventListener("resize", () => {
+    updateSilentEPosition();
   });
 
   // Initialize with one box
