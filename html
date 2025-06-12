@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Phoneme-Grapheme Mapper</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    max-width: 600px;
+    margin: 30px auto;
+    padding: 20px;
+    background: #f9f9f9;
+  }
+  h2 {
+    text-align: center;
+  }
+  #controls {
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  #controls button {
+    margin: 0 10px;
+    padding: 8px 14px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  #box-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+  }
+  .box {
+    position: relative;
+    border: 2px solid #333;
+    border-radius: 6px;
+    width: 80px;
+    min-height: 80px;
+    padding: 10px;
+    box-sizing: border-box;
+    background: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .box input {
+    width: 100%;
+    font-size: 24px;
+    text-align: center;
+    border: none;
+    outline: none;
+    background: transparent;
+  }
+  .remove-btn {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    background: #ff4d4d;
+    border: none;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 1;
+  }
+</style>
+</head>
+<body>
+  <h2>Phoneme-Grapheme Mapper</h2>
+  <div id="controls">
+    <button id="addBoxBtn">+ Add Box</button>
+    <button id="resetBtn">Reset All</button>
+  </div>
+  <div id="box-container"></div>
+
+<script>
+  const boxContainer = document.getElementById("box-container");
+  const addBoxBtn = document.getElementById("addBoxBtn");
+  const resetBtn = document.getElementById("resetBtn");
+
+  // Keep track of boxes
+  let boxes = [];
+
+  function createBox(id) {
+    const boxDiv = document.createElement("div");
+    boxDiv.classList.add("box");
+    boxDiv.dataset.id = id;
+
+    const input = document.createElement("input");
+    input.type = "text";
+    input.placeholder = "Letter(s)";
+    input.maxLength = 5;
+    input.addEventListener("input", () => {
+      // Automatically uppercase letters
+      input.value = input.value.toUpperCase();
+    });
+
+    const removeBtn = document.createElement("button");
+    removeBtn.classList.add("remove-btn");
+    removeBtn.textContent = "×";
+    removeBtn.title = "Remove box";
+    removeBtn.onclick = () => {
+      boxContainer.removeChild(boxDiv);
+      boxes = boxes.filter(b => b !== id);
+    };
+
+    boxDiv.appendChild(input);
+    boxDiv.appendChild(removeBtn);
+
+    return boxDiv;
+  }
+
+  function addBox() {
+    const id = Date.now();
+    boxes.push(id);
+    const box = createBox(id);
+    boxContainer.appendChild(box);
+  }
+
+  function resetBoxes() {
+    const inputs = boxContainer.querySelectorAll("input");
+    inputs.forEach(input => (input.value = ""));
+  }
+
+  // Initialize with one box
+  addBox();
+
+  addBoxBtn.addEventListener("click", addBox);
+  resetBtn.addEventListener("click", resetBoxes);
+</script>
+</body>
+</html>
